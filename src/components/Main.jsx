@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import MovieBox from './MovieBox';
-import WatchedBox from './WatchedBox';
+import Box from './MovieBox';
+import MovieList from './MovieList';
+import Summary from './Summary';
+import WatchedMovieList from './WatchedBox';
 
 const tempWatchedData = [
   {
@@ -29,11 +31,13 @@ function Main({ query, movies }) {
 
   return (
     <main className="main">
-      <MovieBox
-        movies={movies}
-        query={query}
-      />
-      <WatchedBox watched={watched} />
+      <Box>
+        <MovieList movies={movies} />
+      </Box>
+      <Box>
+        <Summary watched={watched} />
+        <WatchedMovieList watched={watched} />
+      </Box>
     </main>
   );
 }

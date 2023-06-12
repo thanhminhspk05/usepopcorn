@@ -1,32 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import WatchedMovie from './WatchedMovie';
 
-
-function WatchedBox({ watched }) {
-  const [isOpen2, setIsOpen2] = useState(true);
-
+function WatchedMovieList({ watched }) {
   return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? '-' : '+'}
-      </button>
-      {isOpen2 && (
-        <>
-          <ul className="list">
-            {watched.map((movie) => (
-              <WatchedMovie
-                movie={movie}
-                key={movie.imdbID}
-              />
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
+    <ul className="list">
+      {watched.map((movie) => (
+        <WatchedMovie
+          movie={movie}
+          key={movie.imdbID}
+        />
+      ))}
+    </ul>
   );
 }
 
-export default WatchedBox;
+export default WatchedMovieList;
