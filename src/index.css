@@ -318,6 +318,7 @@ body {
 }
 
 .btn-back {
+  position: absolute;
   margin: 10px;
   width: 36px;
   height: 36px;

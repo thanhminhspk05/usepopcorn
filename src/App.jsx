@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import StarRating from './StarRating';
 import { useDebounce } from './useDebounce';
 
 // const bestMovieData = [
@@ -80,6 +81,13 @@ export default function App() {
     }
   };
 
+  const handleAddWatch = (movie) => {
+    const findId = watched.findIndex((watched) => watched.id === movie.id);
+    if (findId === -1) {
+      setWatched((watched) => [...watched, movie]); // get old watched and add new movie
+    }
+  };
+
   useEffect(() => {
     fetchMovies();
   }, [debouncedValue]);
@@ -116,6 +124,7 @@ export default function App() {
             <MovieDetails
               selectedId={selectedId}
               setSelectedId={setSelectedId}
+              onAddWatched={handleAddWatch}
             />
           ) : (
             <>
@@ -236,8 +245,10 @@ const Movie = ({ movie, setSelectedId }) => {
   );
 };
 
-const MovieDetails = ({ selectedId, setSelectedId }) => {
+const MovieDetails = ({ selectedId, setSelectedId, onAddWatched }) => {
   const [movie, setMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     Title: title,
     Year: year,
@@ -248,14 +259,32 @@ const MovieDetails = ({ selectedId, setSelectedId }) => {
     Released: released,
     Director: director,
     Genre: genre,
+    Actors: actors,
   } = movie;
 
-  console.log(title, year);
-
   const getMovieDetails = async () => {
+    setIsLoading(true);
     const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`);
     const data = await res.json();
     setMovie(data);
+    setIsLoading(false);
+  };
+
+  const handleAdd = () => {
+    const newWatchedMovie = {
+      Title: title,
+      Year: year,
+      Poster: poster,
+      imdbRating,
+      Plot: plot,
+      Released: released,
+      Director: director,
+      Genre: genre,
+      Actors: actors,
+      Runtime: Number(runtime.split(' ').at(0)),
+    };
+
+    onAddWatched(newWatchedMovie);
   };
 
   useEffect(() => {
@@ -263,15 +292,58 @@ const MovieDetails = ({ selectedId, setSelectedId }) => {
   }, [selectedId]);
 
   return (
-    <div className="details">
-      <span
-        className="btn-back"
-        onClick={() => setSelectedId(null)}
-      >
-        <i className="fa-sharp fa-solid fa-arrow-left"></i>
-      </span>
-      <h1>{selectedId}</h1>
-    </div>
+    <>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div className="details">
+          <header>
+            <span
+              className="btn-back"
+              onClick={() => setSelectedId(null)}
+            >
+              <i className="fa-sharp fa-solid fa-arrow-left"></i>
+            </span>
+            <img
+              src={poster}
+              alt={`Poster of ${movie}`}
+            />
+            <div className="details-overview">
+              <h2>{title}</h2>
+              <p>
+                {released} &bull; {runtime}
+              </p>
+              <p>{genre}</p>
+              <p>
+                <span>⭐</span>
+                {imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
+
+          <section>
+            <div className="rating">
+              <StarRating
+                maxRating={10}
+                size={36}
+              />
+
+              <button
+                className="btn-add"
+                onClick={handleAdd}
+              >
+                + Add to list
+              </button>
+            </div>
+            <p>
+              <em>{plot}</em>
+              Starring {actors}
+            </p>
+            <p>Directed by {director}</p>
+          </section>
+        </div>
+      )}
+    </>
   );
 };
 
